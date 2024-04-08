@@ -200,6 +200,11 @@
           description = "Shell script development environment";
         };
 
+        simple-container = {
+          path = ./simple-container;
+          description = "Simple-container development environment";
+        };
+
         zig = {
           path = ./zig;
           description = "Zig development environment";

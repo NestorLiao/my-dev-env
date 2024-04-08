@@ -1,6 +1,3 @@
 .direnv/
 target
-python/.direnv
-python/.venv/
-rust/.direnv
 result
