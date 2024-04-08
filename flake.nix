@@ -60,6 +60,11 @@
     }
     // {
       templates = rec {
+        ccpp = {
+          path = ./ccpp;
+          description = "C/C++ development environment";
+        };
+
         clojure = {
           path = ./clojure;
           description = "Clojure development environment";
@@ -212,6 +217,8 @@
 
         # Aliases
         rt = rust-toolchain;
+        c = ccpp;
+        cpp = ccpp;
       };
     };
 }
