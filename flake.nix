@@ -60,6 +60,11 @@
     }
     // {
       templates = rec {
+        bevy = {
+          path = ./bevy;
+          description = "Rust game development environment";
+        };
+
         ccpp = {
           path = ./ccpp;
           description = "C/C++ development environment";
