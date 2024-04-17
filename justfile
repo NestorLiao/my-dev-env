@@ -3,12 +3,15 @@ default: run test monitor clean build deploy lint
 copyjustfile:
   find . -type d ! -path "./.git*" ! -path "./.direnv*"  -exec cp -f justfile {} \;
 
+copygitignore:
+  find . -type d ! -path "./.git*" ! -path "./.direnv*"  -exec cp -f .gitignore {} \;
+
 
 # keys for run custom command to panel 2
 analysis:
   echo 'Analysising!'
 run:
-  cargo run
+  echo 'Running!'
 test:
   echo 'Testing!'
 monitor:
