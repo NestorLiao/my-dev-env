@@ -214,6 +214,10 @@
           path = ./simple-container;
           description = "Simple-container development environment";
         };
+        tauri = {
+          path = ./tauri;
+          description = "Tauri development environment";
+        };
 
         zig = {
           path = ./zig;
