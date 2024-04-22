@@ -11,7 +11,11 @@
     forEachSupportedSystem = f:
       nixpkgs.lib.genAttrs supportedSystems (system:
         f {
-          pkgs = import nixpkgs {inherit system;};
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+            cudaSupport = true;
+          };
         });
   in {
     devShells = forEachSupportedSystem ({pkgs}: {
@@ -20,22 +24,15 @@
         venvDir = "./.venv";
 
         buildInputs = with pkgs; [
-          # A Python interpreter including the 'venv' module is required to bootstrap
-          # the environment.
-          python3Packages.python
+          libsForQt5.qt5.qtwayland
 
-          # This executes some shell code to initialize a venv in $venvDir before
-          # dropping into the shell
-          python3Packages.venvShellHook
+          (with python3Packages; [
+            python
+            venvShellHook
+            numpy
+            request
+          ])
 
-          # Those are dependencies that we would like to use from nixpkgs, which will
-          # add them to PYTHONPATH and thus make them accessible from within the venv.
-          python3Packages.numpy
-          python3Packages.requests
-
-          # In this particular example, in order to compile any binary extensions they may
-          # require, the Python modules listed in the hypothetical requirements.txt need
-          # the following packages to be installed locally:
           taglib
           openssl
           git
@@ -55,6 +52,8 @@
         # This is optional and can be left out to run pip manually.
         postShellHook = ''
           # allow pip to install wheels
+          export QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins/platforms";
+          export PYTHON_CONFIGURE_OPTS="--enable-shared"
           unset SOURCE_DATE_EPOCH
         '';
       };
