@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Elixir development environment";
+  description = "A Nix-flake-based Vlang development environment";
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
 
@@ -13,14 +13,9 @@
     {
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
-          packages = (with pkgs; [ elixir ]) ++
-            # Linux only
-            (pkgs.lib.optionals (pkgs.stdenv.isLinux)
-              (with pkgs; [ gigalixir inotify-tools libnotify ])) ++
-            # macOS only
-            pkgs.lib.optionals (pkgs.stdenv.isDarwin)
-              ((with pkgs; [ terminal-notifier ]) ++
-                (with pkgs.darwin.apple_sdk.frameworks; [ CoreFoundation CoreServices ]));
+          packages = with pkgs; [
+            vlang
+          ];
         };
       });
     };
