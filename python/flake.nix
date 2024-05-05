@@ -68,13 +68,15 @@
           # pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
           # pip install -r requirements.txt
         '';
+        env = {
+          # QT_QPA_PLATFORM_PLUGIN_PATH = "${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins/platforms";
+          # PYTHON_CONFIGURE_OPTS = "--enable-shared";
+        };
 
         # Now we can execute any commands within the virtual environment.
         # This is optional and can be left out to run pip manually.
         postShellHook = ''
           # allow pip to install wheels
-          # export QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins/platforms";
-          # export PYTHON_CONFIGURE_OPTS="--enable-shared"
           unset SOURCE_DATE_EPOCH
         '';
       };
