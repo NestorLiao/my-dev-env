@@ -71,6 +71,7 @@
         env = {
           # QT_QPA_PLATFORM_PLUGIN_PATH = "${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins/platforms";
           # PYTHON_CONFIGURE_OPTS = "--enable-shared";
+
         };
 
         # Now we can execute any commands within the virtual environment.

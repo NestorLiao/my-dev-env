@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based C# development environment";
+  description = "A Nix-flake-based Lean 4 development environment";
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
 
@@ -13,14 +13,7 @@
     {
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
-          packages = with pkgs; [
-            #dotnet-sdk_6
-            dotnet-sdk_7
-            #dotnet-sdk_8
-            omnisharp-roslyn
-            mono
-            msbuild
-          ];
+          packages = with pkgs; [ lean4 ];
         };
       });
     };
