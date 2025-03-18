@@ -2,21 +2,12 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-<<<<<<< HEAD
-        "lastModified": 1714184256,
-        "narHash": "sha256-/VyiyGD2q6qN/uAvotKxXuQJWLlmSckAdf7S8jj4Q5c=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "698fd43e541a6b8685ed408aaf7a63561018f9f8",
-        "type": "github"
-=======
-        "lastModified": 1739758141,
-        "narHash": "sha256-uq6A2L7o1/tR6VfmYhZWoVAwb3gTy7j4Jx30MIrH0rE=",
-        "rev": "c618e28f70257593de75a7044438efc1c1fc0791",
-        "revCount": 714614,
+        "lastModified": 1742136038,
+        "narHash": "sha256-DDe16FJk18sadknQKKG/9FbwEro7A57tg9vB5kxZ8kY=",
+        "rev": "a1185f4064c18a5db37c5c84e5638c78b46e3341",
+        "revCount": 715729,
         "type": "tarball",
-        "url": "https://api.flakehub.com/f/pinned/NixOS/nixpkgs/0.2411.714614%2Brev-c618e28f70257593de75a7044438efc1c1fc0791/0195155d-20df-7b25-ad70-45871483b8d2/source.tar.gz"
->>>>>>> upstream/main
+        "url": "https://api.flakehub.com/f/pinned/NixOS/nixpkgs/0.2411.715729%2Brev-a1185f4064c18a5db37c5c84e5638c78b46e3341/0195a184-a418-7dfe-8261-a8895da8dd7a/source.tar.gz"
       },
       "original": {
         "type": "tarball",

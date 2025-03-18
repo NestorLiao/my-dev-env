@@ -3,86 +3,97 @@
 
   inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.2411.*";
 
-  outputs = { self, nixpkgs }:
-    let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
-        pkgs = nixpkgs.legacyPackages.${system};
-      });
-
-      scriptDrvs = forEachSupportedSystem ({ pkgs }:
-        let
-          getSystem = "SYSTEM=$(nix eval --impure --raw --expr 'builtins.currentSystem')";
-          forEachDir = exec: ''
-            for dir in */; do
-              (
-                cd "''${dir}"
-                ${exec}
-              )
-            done
-          '';
-        in
-        {
-          format = pkgs.writeShellApplication {
-            name = "format";
-            runtimeInputs = with pkgs; [ nixpkgs-fmt ];
-            text = ''
-              shopt -s globstar
-              nixpkgs-fmt -- **/*.nix
-            '';
-          };
-
-          build = pkgs.writeShellApplication {
-            name = "build";
-            text = ''
-              ${getSystem}
-              ${forEachDir ''
-                echo "building ''${dir}"
-                nix build ".#devShells.''${SYSTEM}.default"
-              ''}
-            '';
-          };
-
-          check = pkgs.writeShellApplication {
-            name = "check";
-            text = forEachDir ''
-              echo "checking ''${dir}"
-              nix flake check --all-systems --no-build
-            '';
-          };
-
-          update = pkgs.writeShellApplication {
-            name = "update";
-            text = forEachDir ''
-              echo "updating ''${dir}"
-              nix flake update
-            '';
-          };
+  outputs = {
+    self,
+    nixpkgs,
+  }: let
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = nixpkgs.legacyPackages.${system};
         });
-    in
+
+    scriptDrvs = forEachSupportedSystem ({pkgs}: let
+      getSystem = "SYSTEM=$(nix eval --impure --raw --expr 'builtins.currentSystem')";
+      forEachDir = exec: ''
+        for dir in */; do
+          (
+            cd "''${dir}"
+
+            ${exec}
+          )
+        done
+      '';
+    in {
+      format = pkgs.writeShellApplication {
+        name = "format";
+        runtimeInputs = with pkgs; [nixpkgs-fmt];
+        text = ''
+          shopt -s globstar
+
+          nixpkgs-fmt -- **/*.nix
+        '';
+      };
+
+      # only run this locally, as Actions will run out of disk space
+      build = pkgs.writeShellApplication {
+        name = "build";
+        text = ''
+          ${getSystem}
+
+          ${forEachDir ''
+            echo "building ''${dir}"
+            nix build ".#devShells.''${SYSTEM}.default"
+          ''}
+        '';
+      };
+
+      check = pkgs.writeShellApplication {
+        name = "check";
+        text = forEachDir ''
+          echo "checking ''${dir}"
+          nix flake check --all-systems --no-build
+        '';
+      };
+
+      update = pkgs.writeShellApplication {
+        name = "update";
+        text = forEachDir ''
+          echo "updating ''${dir}"
+          nix flake update
+        '';
+      };
+    });
+  in
     {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        packages =
-          with scriptDrvs.${pkgs.system}; [
-            build
-            check
-            format
-            update
-          ] ++ [ pkgs.nixpkgs-fmt ];
+      devShells = forEachSupportedSystem ({pkgs}: {
+        default = pkgs.mkShell {
+          packages = with scriptDrvs.${pkgs.system};
+            [
+              build
+              check
+              format
+              update
+            ]
+            ++ [pkgs.nixpkgs-fmt];
+        };
       });
 
-      packages = forEachSupportedSystem ({ pkgs }:
-        rec {
+      packages = forEachSupportedSystem (
+        {pkgs}: rec {
           default = dvt;
           dvt = pkgs.writeShellApplication {
             name = "dvt";
-            bashOptions = [ "errexit" "pipefail" ];
+            bashOptions = ["errexit" "pipefail"];
             text = ''
               if [ -z "''${1}" ]; then
                 echo "no template specified"
                 exit 1
               fi
+
               TEMPLATE=$1
+
               nix \
                 --experimental-features 'nix-command flakes' \
                 flake init \
@@ -92,15 +103,9 @@
           };
         }
       );
-
+    }
+    // {
       templates = rec {
-        # HEAD 中增加的模板
-        bevy = {
-          path = ./bevy;
-          description = "Rust game development environment";
-        };
-
-        # upstream 默认模板
         default = empty;
 
         bun = {
@@ -108,7 +113,7 @@
           description = "Bun development environment";
         };
 
-        "c-cpp" = {
+        c-cpp = {
           path = ./c-cpp;
           description = "C/C++ development environment";
         };
@@ -136,6 +141,11 @@
         elm = {
           path = ./elm;
           description = "Elm development environment";
+        };
+
+        empty = {
+          path = ./empty;
+          description = "Empty dev template that you can customize at will";
         };
 
         gleam = {
@@ -273,18 +283,6 @@
           description = "Shell script development environment";
         };
 
-        # HEAD 中的模板，upstream 里没有的，也保留
-        simple-container = {
-          path = ./simple-container;
-          description = "Simple-container development environment";
-        };
-
-        tauri = {
-          path = ./tauri;
-          description = "Tauri development environment";
-        };
-
-        # upstream 补充的模板
         swi-prolog = {
           path = ./swi-prolog;
           description = "Swi-prolog development environment";
@@ -297,13 +295,37 @@
 
         vlang = {
           path = ./vlang;
-          description = "Vlang development environment";
+          description = "Vlang developent environment";
         };
-      };
 
-      # 定义别名，统一使用 upstream 的 c-cpp
-      c = templates."c-cpp";
-      cpp = templates."c-cpp";
-      rt = templates."rust-toolchain";
-    }
+        zig = {
+          path = ./zig;
+          description = "Zig development environment";
+        };
+
+        bevy = {
+          path = ./bevy;
+          description = "Rust game development environment";
+        };
+        simple-container = {
+          path = ./simple-container;
+          description = "Simple-container development environment";
+        };
+
+        tauri = {
+          path = ./tauri;
+          description = "Tauri development environment";
+        };
+
+        stm32 = {
+          path = ./stm32;
+          description = "stm32 development enviroment";
+        };
+
+        # Aliases
+        c = c-cpp;
+        cpp = c-cpp;
+        rt = rust-toolchain;
+      };
+    };
 }
